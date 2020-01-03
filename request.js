@@ -32,11 +32,6 @@ axios.interceptors.request.use(
         return Promise.reject(error);
     }
 );
-
-let nointercept_arr = [  // 特定接口不做拦截处理
-    '/Qbird/Web/file/upload',
-    '/Qbird/Web/file/audioupload'
-];
 // http响应拦截器
 axios.interceptors.response.use(
     res => {
@@ -44,20 +39,7 @@ axios.interceptors.response.use(
         res = res.data;
         // TODO: 统一接口格式并做处理
         if (res.code != 0) {
-            if(req_url.includes('/msgtpl/')){
-                Vue.prototype.$toast(res.error);
-                return false;
-            } else if(!nointercept_arr.includes(req_url)) {
-                Vue.prototype.$alert(res.error, {
-                    title: "提示",
-                    okText: "确定",
-                    icon: "warn",
-                    pos: 'center',
-                })
-                return false;
-            }  else {
-                return res;
-            }
+            return res;
         }
         return res.data;
     },
@@ -67,7 +49,6 @@ axios.interceptors.response.use(
 );
 
 async function getAxiosData(opts) {
-    // console.log('getAxiosData', opts);
     // 给请求加锁，如果地址相同，则等接口有返回后解锁
     if (ajQueue.indexOf(opts.url) > -1) return;
     ajQueue.push(opts.url);
